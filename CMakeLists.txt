@@ -31,7 +31,13 @@ function(mqtt_ext_copy_runtime_dlls target)
 endfunction()
 
 add_library(MqttExt STATIC
+    include/MqttExt/Client.h
+    include/MqttExt/ConnectOptions.h
+    include/MqttExt/Message.h
     include/MqttExt/Topic.h
+    src/CallbackRegistry.cpp
+    src/CallbackRegistry.h
+    src/Client.cpp
     src/Topic.cpp
 )
 add_library(MqttExt::MqttExt ALIAS MqttExt)
