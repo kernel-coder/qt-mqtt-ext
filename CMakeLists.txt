@@ -29,3 +29,28 @@ function(mqtt_ext_copy_runtime_dlls target)
             VERBATIM)
     endif()
 endfunction()
+
+add_library(MqttExt STATIC
+    include/MqttExt/Topic.h
+    src/Topic.cpp
+)
+add_library(MqttExt::MqttExt ALIAS MqttExt)
+
+set_target_properties(MqttExt PROPERTIES AUTOMOC ON)
+target_compile_features(MqttExt PUBLIC cxx_std_17)
+target_include_directories(MqttExt
+    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+target_link_libraries(MqttExt
+    PUBLIC Qt6::Core
+    PRIVATE ${MQTT_EXT_PAHO_TARGET}
+)
+if(MQTT_EXT_WITH_TLS)
+    target_compile_definitions(MqttExt PRIVATE MQTT_EXT_WITH_TLS)
+endif()
+
+if(MQTT_EXT_BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
