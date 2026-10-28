@@ -1,0 +1,5 @@
+/build*/
+/out/
+CMakeLists.txt.user*
+/broker/.secrets/
+/examples/*/build*/
