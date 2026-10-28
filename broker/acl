@@ -1,0 +1,10 @@
+user tester
+topic readwrite mqtt-ext-test/#
+
+user device-sim
+topic write devices/+/live
+topic write devices/+/status
+
+user app-sim
+topic read devices/+/live
+topic read devices/+/status

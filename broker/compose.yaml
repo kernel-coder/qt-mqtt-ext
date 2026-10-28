@@ -1,0 +1,41 @@
+name: qt-mqtt-ext-broker
+
+services:
+  certificates:
+    image: alpine:3.20
+    command: ["sh", "/scripts/generate-certificates.sh"]
+    volumes:
+      - ./scripts:/scripts:ro
+      - ./.secrets/certs:/certs
+
+  credentials:
+    image: eclipse-mosquitto:2.0.22
+    entrypoint: ["sh", "/scripts/generate-credentials.sh"]
+    volumes:
+      - ./scripts:/scripts:ro
+      - ./.secrets:/secrets
+
+  mosquitto:
+    image: eclipse-mosquitto:2.0.22
+    entrypoint: ["sh", "/scripts/start-mosquitto.sh"]
+    restart: unless-stopped
+    depends_on:
+      certificates:
+        condition: service_completed_successfully
+      credentials:
+        condition: service_completed_successfully
+    ports:
+      - "127.0.0.1:${MQTT_EXT_TCP_PORT:-18830}:1883"
+      - "127.0.0.1:${MQTT_EXT_TLS_PORT:-18883}:8883"
+      - "127.0.0.1:${MQTT_EXT_WS_PORT:-19001}:9001"
+      - "127.0.0.1:${MQTT_EXT_WSS_PORT:-19443}:9443"
+    volumes:
+      - ./scripts:/scripts:ro
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./acl:/mosquitto/config/acl:ro
+      - ./.secrets/mosquitto:/mosquitto/secrets:ro
+      - ./.secrets/certs:/mosquitto/certs:ro
+      - mosquitto-data:/mosquitto/data
+
+volumes:
+  mosquitto-data:
